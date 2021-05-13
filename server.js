@@ -1,10 +1,23 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
-const cors = require('cors');
+const cors = require('cors'); // cross origin resource sharing
+const bodyParser = require('body-parser');
+
 require("dotenv").config();
 
+const app = express();
+app.use(cors());
+
+const PORT = process.env.PORT || 5000;
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
+
 const transporter = nodemailer.createTransport({
-    host: "maryumbokhari97@gmail.com", //replace with your email provider
+    host: "smtp.gmail.com", //replace with your email provider
     port: 587,
     auth: {
         user: process.env.EMAIL,
@@ -22,6 +35,7 @@ transporter.verify(function (error, success) {
 });
 
 app.post('/send', (req, res, next) => {
+    console.log('///////Logging: ', req.params);
     var name = req.body.name
     var email = req.body.email
     var subject = req.body.subject
@@ -29,13 +43,14 @@ app.post('/send', (req, res, next) => {
 
     var mail = {
         from: name,
-        to: 'maryumbokhari97@gmail.com',
+        to: email,
         subject: subject,
         text: message
     }
 
     transporter.sendMail(mail, (err, data) => {
         if (err) {
+            console.log(err);
             res.json({
                 status: 'fail'
             })
@@ -46,3 +61,10 @@ app.post('/send', (req, res, next) => {
         }
     })
 })
+
+app.post("/someRoute", function(req, res) {
+    console.log(req.body);
+    res.send({ status: 'SUCCESS' });
+  });
+
+app.listen(PORT, () => console.log('Now listening'));

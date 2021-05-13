@@ -33,7 +33,7 @@ class ContactForm extends React.Component {
         e.preventDefault();
         axios({
             method: "POST",
-            url: "/send",
+            url: "http://localhost:5000/send",
             data: this.state
         }).then((response) => {
             if (response.data.status === 'success') {
